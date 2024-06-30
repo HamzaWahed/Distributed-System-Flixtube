@@ -1,26 +1,34 @@
 const express = require("express");
-const fs = require("fs");
-
-const app = express();
+const http = require("http");
 
 if (!process.env.PORT) {
-  throw new Error("Environment variable PORT must be supplied.")
+  throw new Error("Environment variable PORT must be supplied.");
 }
 
 const PORT = process.env.PORT;
+const VIDEO_STORAGE_HOST = process.env.VIDEO_STORAGE_HOST;
+const VIDEO_STORAGE_PORT = parseInt(process.env.VIDEO_STORAGE_PORT);
+
+const app = express();
 
 app.get("/video", async (req, res) => {
-  const videoPath = "videos/SampleVideo_1280x720_5mb.mp4";
-  const stats = await fs.promises.stat(videoPath);
+  const forwardRequest = http.request(
+    {
+      host: VIDEO_STORAGE_HOST,
+      port: VIDEO_STORAGE_PORT,
+      path: "/video?path=SampleVideo_1280x720_5mb.mp4",
+      method: "GET",
+      headers: req.headers,
+    },
+    (forwardResponse) => {
+      res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+      forwardResponse.pipe(res);
+    }
+  );
 
-  res.writeHead(200, {
-    "Content-Length": stats.size,
-    "Content-Type": "video/mp4",
-  });
-
-  fs.createReadStream(videoPath).pipe(res);
+  req.pipe(forwardRequest);
 });
 
 app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+  console.log(`Service listening on port ${PORT}`);
 });

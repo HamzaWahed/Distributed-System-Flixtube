@@ -41,5 +41,5 @@ app.get("/video", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Microservice listening on port ${PORT}.`)
+  console.log(`Service listening on port ${PORT}.`)
 })
