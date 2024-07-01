@@ -10,8 +10,11 @@ services:
     image: azure-storage
     build:
       context: ./azure-storage
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-dev
     container_name: video-storage
+    volumes:
+      - /tmp/history/npm-cache:/root/.npm:z
+      - ./history/src:/usr/src/app/src:z
     ports:
       - "4001:80"
     environment:
@@ -24,8 +27,11 @@ services:
     image: video-streaming
     build:
       context: ./video-streaming
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-dev
     container_name: video-streaming
+    volumes:
+      - /tmp/history/npm-cache:/root/.npm:z
+      - ./history/src:/usr/src/app/src:z
     ports:
       - "4002:80"
     environment:
@@ -36,4 +42,20 @@ services:
       - VIDEO_STORAGE_PORT=80
     depends_on:
       - db
+    restart: "no"
+
+  history:
+    image: history
+    build:
+      context: ./history
+      dockerfile: Dockerfile-dev
+    container_name: history
+    volumes:
+      - /tmp/history/npm-cache:/root/.npm:z
+      - ./history/src:/usr/src/app/src:z
+    ports:
+      - "4003:80"
+    environment:
+      - PORT=80
+      - NODE_ENV=development
     restart: "no"
