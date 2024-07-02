@@ -7,6 +7,7 @@ if (!process.env.PORT) {
 const PORT = process.env.PORT;
 
 const main = async () => {
+  console.log("Hello World");
   const app = express();
 
   app.listen(PORT, () => {
@@ -14,7 +15,7 @@ const main = async () => {
   });
 };
 
-main().catch(err => {
-  console.log('service failed to start')
-  console.log(err && err.stack || err);
-})
+main().catch((err) => {
+  console.log("service failed to start");
+  console.log((err && err.stack) || err);
+});

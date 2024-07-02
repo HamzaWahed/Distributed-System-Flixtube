@@ -13,8 +13,8 @@ services:
       dockerfile: Dockerfile-dev
     container_name: video-storage
     volumes:
-      - /tmp/history/npm-cache:/root/.npm:z
-      - ./history/src:/usr/src/app/src:z
+      - /tmp/azure-storage/npm-cache:/root/.npm:z
+      - ./azure-storage/src:/usr/src/app/src:z
     ports:
       - "4001:80"
     environment:
@@ -30,8 +30,8 @@ services:
       dockerfile: Dockerfile-dev
     container_name: video-streaming
     volumes:
-      - /tmp/history/npm-cache:/root/.npm:z
-      - ./history/src:/usr/src/app/src:z
+      - /tmp/video-streaming/npm-cache:/root/.npm:z
+      - ./video-streaming/src:/usr/src/app/src:z
     ports:
       - "4002:80"
     environment:
