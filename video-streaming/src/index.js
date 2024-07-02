@@ -36,6 +36,32 @@ const DB_HOST = process.env.DB_HOST;
 const VIDEO_STORAGE_HOST = process.env.VIDEO_STORAGE_HOST;
 const VIDEO_STORAGE_PORT = parseInt(process.env.VIDEO_STORAGE_PORT);
 
+const sendViewedMessage = (videoPath) => {
+  const postOptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  const reqBody = {
+    videoPath: videoPath,
+  };
+
+  const req = http.request("http://history/viewed", postOptions);
+  req.on("close", () => {
+    console.log("Sent 'viewed' message to history microservice.");
+  });
+
+  req.on("error", (err) => {
+    console.error("Failed to send 'viewed' message!");
+    console.error((err && err.stack) || err);
+  });
+
+  req.write(JSON.stringify(reqBody));
+  req.end();
+};
+
 const main = async () => {
   const client = await mongodb.MongoClient.connect(DB_HOST);
   const db = client.db(DB_NAME);
@@ -46,6 +72,7 @@ const main = async () => {
   app.get("/video", async (req, res) => {
     const videoId = new mongodb.ObjectId(req.query.id);
     const videoRecord = await videosCollection.findOne({ _id: videoId });
+    sendViewedMessage("SampleVideo_1280x720_5mb.mp4");
     if (!videoRecord) {
       res.sendStatus(404);
       return;
