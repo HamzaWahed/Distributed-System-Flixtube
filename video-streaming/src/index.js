@@ -72,7 +72,6 @@ const main = async () => {
   app.get("/video", async (req, res) => {
     const videoId = new mongodb.ObjectId(req.query.id);
     const videoRecord = await videosCollection.findOne({ _id: videoId });
-    sendViewedMessage("SampleVideo_1280x720_5mb.mp4");
     if (!videoRecord) {
       res.sendStatus(404);
       return;
@@ -93,6 +92,7 @@ const main = async () => {
     );
 
     req.pipe(forwardRequest);
+    sendViewedMessage(videoRecord.videoPath);
   });
 
   app.listen(PORT, () => {
