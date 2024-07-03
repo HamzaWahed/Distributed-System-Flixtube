@@ -41,7 +41,7 @@ const main = async () => {
       videoPath: parsedMsg.videoPath,
     });
 
-    messageChannel.ack();
+    messageChannel.ack(msg);
   });
 
   app.post("/viewed", async (req, res) => {
