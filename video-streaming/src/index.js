@@ -42,7 +42,7 @@ const VIDEO_STORAGE_HOST = process.env.VIDEO_STORAGE_HOST;
 const VIDEO_STORAGE_PORT = parseInt(process.env.VIDEO_STORAGE_PORT);
 const RABBIT = process.env.RABBIT;
 
-const sendViewedMessage = (messageChannel, videoPath) => {
+const broadcastViewedMessage = (messageChannel, videoPath) => {
   const msg = { videoPath: videoPath };
   const jsonMsg = JSON.stringify(msg);
   messageChannel.publish("", "viewed", Buffer.from(jsonMsg));
@@ -55,6 +55,7 @@ const main = async () => {
 
   const messagingConnection = await amqp.connect(RABBIT);
   const messageChannel = await messagingConnection.createChannel();
+  await messageChannel.assertExchange("viewed", "fanout");
 
   const app = express();
 
@@ -81,7 +82,7 @@ const main = async () => {
     );
 
     req.pipe(forwardRequest);
-    sendViewedMessage(messageChannel, videoRecord.videoPath);
+    broadcastViewedMessage(messageChannel, videoRecord.videoPath);
   });
 
   app.listen(PORT, () => {

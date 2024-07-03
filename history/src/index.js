@@ -33,8 +33,11 @@ const main = async () => {
 
   const messagingConnection = await amqp.connect(RABBIT);
   const messageChannel = await messagingConnection.createChannel();
-  await messageChannel.assertQueue("viewed", {});
-  await messageChannel.consume("viewed", async (msg) => {
+  await messageChannel.assertExchange("viewed", "fanout");
+  const { queue } = await messageChannel.assertQueue("", { exclusive: true });
+  await messageChannel.bindQueue(queue, "viewed", "");
+
+  await messageChannel.consume(queue, async (msg) => {
     const parsedMsg = JSON.parse(msg.content.toString());
 
     await historyCollection.insertOne({
